@@ -22,6 +22,14 @@ const rotateImg = async (
     });
 };
 
+const getRootDir = () => {
+  const rootDirDev = path.resolve(__dirname, "..", ".."); // Directorio raíz en desarrollo
+  const rootDirProd = path.resolve(__dirname, "..", "..", "src"); // Directorio raíz en producción
+  return fs.existsSync(path.join(__dirname, "..", "..", "build"))
+    ? rootDirProd
+    : rootDirDev;
+};
+
 const deleteFolder = async (folder: string, id: string) => {
   try {
     const dir = `./${folder}/${id}`;
@@ -51,4 +59,4 @@ const getImageDimensions = (imgPath: string): ImageSize => {
   return dimensions;
 };
 
-export { rotateImg, deleteFolder, getImageDimensions };
+export { rotateImg, getRootDir,deleteFolder, getImageDimensions };

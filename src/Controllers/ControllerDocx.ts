@@ -14,6 +14,7 @@ import {
   rotateImg,
   deleteFolder,
   getImageDimensions,
+  getRootDir,
 } from "../Helpers/rotateImg";
 
 const sendMessage = (_req: Request, res: Response) => {
@@ -28,15 +29,19 @@ const getDocxById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const nameFolder: string = req.query.nameFolder as string;
   try {
-    const dir = `./src/Uploads/${id}`;
+    const rootDir = getRootDir();
+    const dir = path.join(rootDir, "Uploads", id);
 
-    const processedDir = `./src/Processed_uploads/${id}`;
+    const processedDir = path.join(rootDir, "Processed_uploads", id);
     if (!fs.existsSync(processedDir)) {
       fs.mkdirSync(processedDir);
     }
-    const docxDir = `./src/Docxs_generados/${nameFolder}.docx`;
-    const docxDirRuta = `../Docxs_generados/${nameFolder}.docx`;
-    const docxPath = path.resolve(__dirname, docxDirRuta);
+    const docxDir = path.join(rootDir, "Docxs_generados", `${nameFolder}.docx`);
+    const docxPath = path.join(
+      rootDir,
+      "Docxs_generados",
+      `${nameFolder}.docx`
+    );
 
     const files = fs.readdirSync(dir);
 

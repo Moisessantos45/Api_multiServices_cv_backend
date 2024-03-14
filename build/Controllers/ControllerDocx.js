@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDocxById = exports.sendMessage = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const image_size_1 = __importDefault(require("image-size"));
 const docx_1 = require("docx");
 const rotateImg_1 = require("../Helpers/rotateImg");
 const sendMessage = (_req, res) => {
@@ -31,21 +30,21 @@ const getDocxById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const { id } = req.params;
     const nameFolder = req.query.nameFolder;
     try {
-        const dir = `./src/Uploads/${id}`;
-        const processedDir = `./src/Processed_uploads/${id}`;
+        const rootDir = (0, rotateImg_1.getRootDir)();
+        const dir = path_1.default.join(rootDir, "Uploads", id);
+        const processedDir = path_1.default.join(rootDir, "Processed_uploads", id);
         if (!fs_1.default.existsSync(processedDir)) {
             fs_1.default.mkdirSync(processedDir);
         }
-        const docxDir = `./src/Docxs_generados/${nameFolder}.docx`;
-        const docxDirRuta = `../Docxs_generados/${nameFolder}.docx`;
-        const docxPath = path_1.default.resolve(__dirname, docxDirRuta);
+        const docxDir = path_1.default.join(rootDir, "Docxs_generados", `${nameFolder}.docx`);
+        const docxPath = path_1.default.join(rootDir, "Docxs_generados", `${nameFolder}.docx`);
         const files = fs_1.default.readdirSync(dir);
         const sections = files.map((file, i) => __awaiter(void 0, void 0, void 0, function* () {
             const imgPath = `${dir}/${file}`;
             const processedImgPath = `${processedDir}/processed_${file}`;
             yield (0, rotateImg_1.rotateImg)(imgPath, processedImgPath, "portrait");
             const img = fs_1.default.readFileSync(processedImgPath);
-            const { width, height } = (0, image_size_1.default)(processedImgPath);
+            const { width, height } = (0, rotateImg_1.getImageDimensions)(processedImgPath);
             if (width === undefined)
                 return;
             if (height === undefined)

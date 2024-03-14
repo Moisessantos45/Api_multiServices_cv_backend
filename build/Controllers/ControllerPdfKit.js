@@ -16,7 +16,6 @@ exports.getPdfById = exports.sendMessage = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const pdfkit_1 = __importDefault(require("pdfkit"));
-const image_size_1 = __importDefault(require("image-size"));
 const rotateImg_1 = require("../Helpers/rotateImg");
 const sendMessage = (_req, res) => {
     try {
@@ -31,21 +30,25 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { id } = req.params;
     const nameFolder = req.query.nameFolder;
     const orientacion = req.query.orientacion;
-    console.log(orientacion);
     try {
-        const dir = `./src/Uploads/${id}`;
-        const processedDir = `./src/Processed_uploads/${id}`;
-        const pdfDir = `./src/Pdfs_generados/${nameFolder}.pdf`;
-        const pdfDirRuta = `../Pdfs_generados/${nameFolder}.pdf`;
+        // Obtén el directorio raíz
+        const rootDir = (0, rotateImg_1.getRootDir)();
+        const dir = path_1.default.join(rootDir, "Uploads", id);
+        const processedDir = path_1.default.join(rootDir, "Processed_uploads", id);
+        const pdfDir = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
+        const pdfPath = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
+        // const processedDir = `./src/Processed_uploads/${id}`;
+        // const pdfDir = `./src/Pdfs_generados/${nameFolder}.pdf`;
+        // const pdfDirRuta = `../Pdfs_generados/${nameFolder}.pdf`;
         if (!fs_1.default.existsSync(processedDir)) {
             fs_1.default.mkdirSync(processedDir);
         }
-        const pdfPath = path_1.default.resolve(__dirname, pdfDirRuta);
+        // const pdfPath = path.resolve(__dirname, pdfDirRuta);
         const files = fs_1.default.readdirSync(dir);
         const firstImagePath = `${processedDir}/processed_${files[0]}`;
         const outputPathOne = `${dir}/${files[0]}`;
         yield (0, rotateImg_1.rotateImg)(outputPathOne, firstImagePath, orientacion);
-        const { width: firstImageWidth, height: firstImageHeight } = (0, image_size_1.default)(firstImagePath);
+        const { width: firstImageWidth, height: firstImageHeight } = (0, rotateImg_1.getImageDimensions)(firstImagePath);
         if (firstImageWidth === undefined)
             return;
         if (firstImageHeight === undefined)
@@ -70,7 +73,7 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const imgPath = `${dir}/${file}`;
             const outputPath = `${processedDir}/processed_${file}`;
             yield (0, rotateImg_1.rotateImg)(imgPath, outputPath, orientacion);
-            const { width, height } = (0, image_size_1.default)(outputPath);
+            const { width, height } = (0, rotateImg_1.getImageDimensions)(outputPath);
             if (width === undefined)
                 return;
             if (height === undefined)

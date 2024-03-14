@@ -7,6 +7,7 @@ import {
   rotateImg,
   deleteFolder,
   getImageDimensions,
+  getRootDir,
 } from "../Helpers/rotateImg";
 
 const sendMessage = (_req: Request, res: Response) => {
@@ -18,19 +19,23 @@ const sendMessage = (_req: Request, res: Response) => {
 };
 
 const getPdfById = async (req: Request, res: Response) => {
-  console.time("pdf");
   const { id } = req.params;
   const nameFolder: string = req.query.nameFolder as string;
   const orientacion: string = req.query.orientacion as string;
   try {
-    const dir = `./src/Uploads/${id}`;
-    const processedDir = `./src/Processed_uploads/${id}`;
-    const pdfDir = `./src/Pdfs_generados/${nameFolder}.pdf`;
-    const pdfDirRuta = `../Pdfs_generados/${nameFolder}.pdf`;
+    // Obtén el directorio raíz
+    const rootDir = getRootDir();
+    const dir = path.join(rootDir, "Uploads", id);
+    const processedDir = path.join(rootDir, "Processed_uploads", id);
+    const pdfDir = path.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
+    const pdfPath = path.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
+    // const processedDir = `./src/Processed_uploads/${id}`;
+    // const pdfDir = `./src/Pdfs_generados/${nameFolder}.pdf`;
+    // const pdfDirRuta = `../Pdfs_generados/${nameFolder}.pdf`;
     if (!fs.existsSync(processedDir)) {
       fs.mkdirSync(processedDir);
     }
-    const pdfPath = path.resolve(__dirname, pdfDirRuta);
+    // const pdfPath = path.resolve(__dirname, pdfDirRuta);
     const files = fs.readdirSync(dir);
     const firstImagePath = `${processedDir}/processed_${files[0]}`;
     const outputPathOne = `${dir}/${files[0]}`;
@@ -106,7 +111,6 @@ const getPdfById = async (req: Request, res: Response) => {
         fs.unlinkSync(pdfDir);
       }, 5000);
     });
-    console.timeEnd("pdf");
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Internal server error" });
