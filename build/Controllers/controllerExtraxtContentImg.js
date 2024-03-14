@@ -87,7 +87,7 @@ const sendImages = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 }
             }
         })));
-        // Leer directorio y enviar imágenes al frontend
+        // Leer el directorio y enviar imágenes al frontend
         const images = yield fs_1.default.promises
             .readdir(outputDir)
             .then((files) => __awaiter(void 0, void 0, void 0, function* () {
@@ -103,7 +103,7 @@ const sendImages = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }))
             .catch((error) => {
             console.error(`Error reading directory: ${error}`);
-            return [];
+            throw new Error("Error al leer el directorio");
         });
         res.status(200).json(images);
         fs_1.default.unlinkSync(direcctorio);

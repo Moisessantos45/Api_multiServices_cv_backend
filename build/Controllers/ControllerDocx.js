@@ -112,7 +112,7 @@ const getDocxById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                     (0, rotateImg_1.deleteFolder)("./src/Uploads", id);
                     (0, rotateImg_1.deleteFolder)("./src/Processed_uploads", id);
                     fs_1.default.unlinkSync(docxDir);
-                }, 7000);
+                }, 4000);
             });
         });
     }

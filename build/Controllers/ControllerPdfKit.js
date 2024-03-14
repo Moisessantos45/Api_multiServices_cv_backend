@@ -31,19 +31,15 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const nameFolder = req.query.nameFolder;
     const orientacion = req.query.orientacion;
     try {
-        // Obtén el directorio raíz
+        // Para obtener el directorio raíz
         const rootDir = (0, rotateImg_1.getRootDir)();
         const dir = path_1.default.join(rootDir, "Uploads", id);
         const processedDir = path_1.default.join(rootDir, "Processed_uploads", id);
         const pdfDir = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
         const pdfPath = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
-        // const processedDir = `./src/Processed_uploads/${id}`;
-        // const pdfDir = `./src/Pdfs_generados/${nameFolder}.pdf`;
-        // const pdfDirRuta = `../Pdfs_generados/${nameFolder}.pdf`;
         if (!fs_1.default.existsSync(processedDir)) {
             fs_1.default.mkdirSync(processedDir);
         }
-        // const pdfPath = path.resolve(__dirname, pdfDirRuta);
         const files = fs_1.default.readdirSync(dir);
         const firstImagePath = `${processedDir}/processed_${files[0]}`;
         const outputPathOne = `${dir}/${files[0]}`;

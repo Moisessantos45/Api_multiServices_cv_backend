@@ -121,7 +121,7 @@ const getDocxById = async (req: Request, res: Response) => {
           deleteFolder("./src/Uploads", id);
           deleteFolder("./src/Processed_uploads", id);
           fs.unlinkSync(docxDir);
-        }, 7000);
+        }, 4000);
       });
     });
   } catch (error) {

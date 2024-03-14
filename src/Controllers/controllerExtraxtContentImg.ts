@@ -84,7 +84,7 @@ const sendImages = async (req: Request, res: Response) => {
         }
       })
     );
-    // Leer directorio y enviar imágenes al frontend
+    // Leer el directorio y enviar imágenes al frontend
     const images = await fs.promises
       .readdir(outputDir)
       .then(async (files) => {
@@ -102,7 +102,7 @@ const sendImages = async (req: Request, res: Response) => {
       })
       .catch((error) => {
         console.error(`Error reading directory: ${error}`);
-        return [];
+        throw new Error("Error al leer el directorio");
       });
 
     res.status(200).json(images);
