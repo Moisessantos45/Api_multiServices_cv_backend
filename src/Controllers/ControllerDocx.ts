@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { Request, Response } from "express";
-import sizeOf from "image-size";
 import {
   Document,
   Packer,
@@ -11,7 +10,11 @@ import {
   VerticalPositionRelativeFrom,
   VerticalPositionAlign,
 } from "docx";
-import { rotateImg, deleteFolder } from "../Helpers/rotateImg";
+import {
+  rotateImg,
+  deleteFolder,
+  getImageDimensions,
+} from "../Helpers/rotateImg";
 
 const sendMessage = (_req: Request, res: Response) => {
   try {
@@ -44,7 +47,7 @@ const getDocxById = async (req: Request, res: Response) => {
       await rotateImg(imgPath, processedImgPath, "portrait");
 
       const img = fs.readFileSync(processedImgPath);
-      const { width, height } = sizeOf(processedImgPath);
+      const { width, height } = getImageDimensions(processedImgPath);
       if (width === undefined) return;
       if (height === undefined) return;
       const pageWidth = (8.5 * 1440) / 16; // Ancho de la página (en twips)

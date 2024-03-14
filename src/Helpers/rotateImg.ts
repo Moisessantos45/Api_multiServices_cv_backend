@@ -1,6 +1,8 @@
 import Jimp from "jimp";
 import fs from "fs";
 import path from "path";
+import sizeOf from "image-size";
+import { ImageSize } from "../Types/type";
 
 const rotateImg = async (
   imgPath: string,
@@ -44,4 +46,9 @@ const deleteFolder = async (folder: string, id: string) => {
   }
 };
 
-export { rotateImg, deleteFolder };
+const getImageDimensions = (imgPath: string): ImageSize => {
+  const dimensions = sizeOf(imgPath);
+  return dimensions;
+};
+
+export { rotateImg, deleteFolder, getImageDimensions };

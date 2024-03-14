@@ -1,3 +1,8 @@
 type LayoutType = "portrait" | "landscape";
 
-export { LayoutType };
+type ImageSize = {
+  width?: number;
+  height?: number;
+};
+
+export { LayoutType, ImageSize };

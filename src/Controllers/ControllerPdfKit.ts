@@ -2,9 +2,12 @@ import fs from "fs";
 import path from "path";
 import { Request, Response } from "express";
 import pdfkit from "pdfkit";
-import sizeOf from "image-size";
 import { LayoutType } from "../Types/type";
-import { rotateImg, deleteFolder } from "../Helpers/rotateImg";
+import {
+  rotateImg,
+  deleteFolder,
+  getImageDimensions,
+} from "../Helpers/rotateImg";
 
 const sendMessage = (_req: Request, res: Response) => {
   try {
@@ -15,10 +18,10 @@ const sendMessage = (_req: Request, res: Response) => {
 };
 
 const getPdfById = async (req: Request, res: Response) => {
+  console.time("pdf");
   const { id } = req.params;
   const nameFolder: string = req.query.nameFolder as string;
   const orientacion: string = req.query.orientacion as string;
-  console.log(orientacion);
   try {
     const dir = `./src/Uploads/${id}`;
     const processedDir = `./src/Processed_uploads/${id}`;
@@ -34,7 +37,7 @@ const getPdfById = async (req: Request, res: Response) => {
     await rotateImg(outputPathOne, firstImagePath, orientacion);
 
     const { width: firstImageWidth, height: firstImageHeight } =
-      sizeOf(firstImagePath);
+      getImageDimensions(firstImagePath);
     if (firstImageWidth === undefined) return;
     if (firstImageHeight === undefined) return;
     let firstLayout: LayoutType = "portrait";
@@ -59,7 +62,7 @@ const getPdfById = async (req: Request, res: Response) => {
 
       await rotateImg(imgPath, outputPath, orientacion);
 
-      const { width, height } = sizeOf(outputPath);
+      const { width, height } = getImageDimensions(outputPath);
 
       if (width === undefined) return;
       if (height === undefined) return;
@@ -103,6 +106,7 @@ const getPdfById = async (req: Request, res: Response) => {
         fs.unlinkSync(pdfDir);
       }, 5000);
     });
+    console.timeEnd("pdf");
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Internal server error" });

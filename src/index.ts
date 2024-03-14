@@ -1,9 +1,11 @@
 import express from "express";
 import router from "./Routers";
 import cors from "cors";
+import dotenv from "dotenv";
 
 const app = express();
 app.use(express.json());
+dotenv.config();
 
 const allowedUrls = [process.env.FRONTEND_URL_HOST];
 
