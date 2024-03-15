@@ -30,6 +30,7 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { id } = req.params;
     const nameFolder = req.query.nameFolder;
     const orientacion = req.query.orientacion;
+    const adjust = JSON.parse(req.query.adjust);
     try {
         // Para obtener el directorio raíz
         const rootDir = (0, rotateImg_1.getRootDir)();
@@ -37,21 +38,23 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const processedDir = path_1.default.join(rootDir, "Processed_uploads", id);
         const pdfDir = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
         const pdfPath = path_1.default.join(rootDir, "Pdfs_generados", `${nameFolder}.pdf`);
-        if (!fs_1.default.existsSync(processedDir)) {
+        if (adjust && !fs_1.default.existsSync(processedDir)) {
             fs_1.default.mkdirSync(processedDir);
         }
         const files = fs_1.default.readdirSync(dir);
-        const firstImagePath = `${processedDir}/processed_${files[0]}`;
+        const firstImagePath = adjust
+            ? `${processedDir}/processed_${files[0]}`
+            : `${dir}/${files[0]}`;
         const outputPathOne = `${dir}/${files[0]}`;
-        yield (0, rotateImg_1.rotateImg)(outputPathOne, firstImagePath, orientacion);
+        if (adjust) {
+            yield (0, rotateImg_1.rotateImg)(outputPathOne, firstImagePath, orientacion);
+        }
         const { width: firstImageWidth, height: firstImageHeight } = (0, rotateImg_1.getImageDimensions)(firstImagePath);
-        if (firstImageWidth === undefined)
-            return;
-        if (firstImageHeight === undefined)
-            return;
         let firstLayout = "portrait";
-        if (orientacion === "automatico") {
-            if (firstImageWidth > firstImageHeight) {
+        if (orientacion === "automatic") {
+            if (firstImageWidth &&
+                firstImageHeight !== undefined &&
+                firstImageWidth > firstImageHeight) {
                 firstLayout = "landscape";
             }
         }
@@ -67,16 +70,14 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         for (let index = 0; index < files.length; index++) {
             const file = files[index];
             const imgPath = `${dir}/${file}`;
-            const outputPath = `${processedDir}/processed_${file}`;
-            yield (0, rotateImg_1.rotateImg)(imgPath, outputPath, orientacion);
+            const outputPath = adjust ? `${processedDir}/processed_${file}` : imgPath;
+            if (adjust) {
+                yield (0, rotateImg_1.rotateImg)(imgPath, outputPath, orientacion);
+            }
             const { width, height } = (0, rotateImg_1.getImageDimensions)(outputPath);
-            if (width === undefined)
-                return;
-            if (height === undefined)
-                return;
             let layout = "portrait";
-            if (orientacion === "automatico") {
-                if (width > height) {
+            if (orientacion === "automatic") {
+                if (width && height !== undefined && width > height) {
                     layout = "landscape";
                 }
             }
@@ -89,13 +90,13 @@ const getPdfById = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const pdfWidth = newPdf.page.width;
             const pdfHeight = newPdf.page.height;
             let imgWidth, imgHeight;
-            if (width > height) {
+            if (width && height !== undefined && width > height) {
                 imgWidth = pdfWidth;
                 imgHeight = (pdfWidth / width) * height;
             }
             else {
                 imgHeight = pdfHeight;
-                imgWidth = (pdfHeight / height) * width;
+                imgWidth = height && width ? (pdfHeight / height) * width : pdfHeight;
             }
             const x = (pdfWidth - imgWidth) / 2;
             const y = (pdfHeight - imgHeight) / 2;

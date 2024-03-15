@@ -7,14 +7,14 @@ import { ImageSize } from "../Types/type";
 const rotateImg = async (
   imgPath: string,
   outputPath: string,
-  orientation: string
+  _orientation: string
 ) => {
   await Jimp.read(imgPath)
     .then((img) => {
-      const { width, height } = img.bitmap;
-      if (orientation !== "automatico" && width > height) {
-        return img.rotate(90).writeAsync(outputPath);
-      }
+      // const { width, height } = img.bitmap;
+      // if (orientation !== "automatico" && width > height) {
+      //   return img.rotate(90).writeAsync(outputPath);
+      // }
       return img.writeAsync(outputPath);
     })
     .catch((e) => {
@@ -59,4 +59,4 @@ const getImageDimensions = (imgPath: string): ImageSize => {
   return dimensions;
 };
 
-export { rotateImg, getRootDir,deleteFolder, getImageDimensions };
+export { rotateImg, getRootDir, deleteFolder, getImageDimensions };

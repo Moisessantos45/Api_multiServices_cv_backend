@@ -17,13 +17,13 @@ const jimp_1 = __importDefault(require("jimp"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const image_size_1 = __importDefault(require("image-size"));
-const rotateImg = (imgPath, outputPath, orientation) => __awaiter(void 0, void 0, void 0, function* () {
+const rotateImg = (imgPath, outputPath, _orientation) => __awaiter(void 0, void 0, void 0, function* () {
     yield jimp_1.default.read(imgPath)
         .then((img) => {
-        const { width, height } = img.bitmap;
-        if (orientation !== "automatico" && width > height) {
-            return img.rotate(90).writeAsync(outputPath);
-        }
+        // const { width, height } = img.bitmap;
+        // if (orientation !== "automatico" && width > height) {
+        //   return img.rotate(90).writeAsync(outputPath);
+        // }
         return img.writeAsync(outputPath);
     })
         .catch((e) => {
