@@ -1,7 +1,10 @@
 import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
-import { sendImages } from "../Controllers/controllerExtraxtContentImg";
+import {
+  sendImages,
+  sendMessageImages,
+} from "../Controllers/controllerExtraxtContentImg";
 
 const storage = multer.diskStorage({
   destination: function (req, _file, cb) {
@@ -23,6 +26,7 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post("/post_file/:id/:i", upload.array("files"), sendImages);
+router.post("/post_file/:id", upload.array("files"), sendMessageImages);
+router.get("/:id", sendImages);
 
 export default router;

@@ -1,7 +1,10 @@
 import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
-import { extractContentText } from "../Controllers/ControllerExtractText";
+import {
+  extractContentText,
+  sendMessageText,
+} from "../Controllers/ControllerExtractText";
 
 const storage = multer.diskStorage({
   destination: function (req, _file, cb) {
@@ -23,6 +26,7 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post("/post_doc/:id", upload.array("docs"), extractContentText);
+router.post("/post_doc/:id", upload.array("docs"), sendMessageText);
+router.get("/:id", extractContentText);
 
 export default router;

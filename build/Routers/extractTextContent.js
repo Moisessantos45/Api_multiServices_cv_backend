@@ -23,5 +23,6 @@ const storage = multer_1.default.diskStorage({
 });
 const upload = (0, multer_1.default)({ storage: storage });
 const router = (0, express_1.Router)();
-router.post("/post_doc/:id", upload.array("docs"), ControllerExtractText_1.extractContentText);
+router.post("/post_doc/:id", upload.array("docs"), ControllerExtractText_1.sendMessageText);
+router.get("/:id", ControllerExtractText_1.extractContentText);
 exports.default = router;

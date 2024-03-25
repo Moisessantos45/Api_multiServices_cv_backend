@@ -3,22 +3,7 @@ import path from "path";
 import pdf2json from "pdf2json";
 import mammoth from "mammoth";
 import { Response, Request } from "express";
-
-const deleteFolderWidthFiles = (id: string, folder: string) => {
-  const dir = path.join(folder, id);
-  try {
-    fs.readdir(dir, (err, files) => {
-      if (err) {
-        throw new Error("Error al leer la carpeta");
-      }
-      if (files.length === 0) {
-        fs.rmSync(dir, { recursive: true, force: true });
-      }
-    }); 
-  } catch (error) {
-    throw new Error("Error al eliminar la carpeta");
-  }
-};
+import { deleteFolder, getRootDir } from "../Helpers/rotateImg";
 
 interface PdfData {
   Pages: {
@@ -51,7 +36,6 @@ const extractTextPdf = async (dir: string) => {
       });
     });
   } catch (error) {
-    console.log(error);
     throw new Error("Error al extraer el texto del pdf");
   }
 
@@ -70,34 +54,56 @@ const extractTextDocx = async (dir: string) => {
   return data;
 };
 
-const extractContentText = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const files = req.files as Express.Multer.File[];
-
-  if (!files || files.length === 0) {
-    res.status(400).json({ msg: "No se subió ningún archivo" });
-    return;
-  }
-  let content: string = "";
-  const fileExtension = path.extname(files[0].path);
-  if (fileExtension !== ".pdf" && fileExtension !== ".docx") {
-    res.status(400).json({ msg: "El archivo no es valido" });
-    return;
-  }
+const sendMessageText = async (_req: Request, res: Response) => {
   try {
-    if (fileExtension == ".pdf") {
-      content = await extractTextPdf(files[0].path);
-    } else {
-      content = await extractTextDocx(files[0].path);
-    }
-    res.status(200).json(content);
-    fs.unlinkSync(files[0].path);
-    deleteFolderWidthFiles(req.params.id, "./src/Uploads");
+    res.status(200).json({ msg: "Files save successfully" });
   } catch (error) {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
 
-export { extractContentText };
+const extractContentText = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const rootDir = getRootDir();
+
+  const dir = path.join(rootDir, "Uploads", id);
+
+  try {
+    const filesText = fs.readdirSync(dir);
+    const content: string[] = [];
+
+    const promises = filesText.map(async (file, _i) => {
+      const pathFile = path.join(dir, file);
+      const fileExtension = path.extname(pathFile);
+      let text = "";
+      if (fileExtension === ".pdf" || fileExtension === ".docx") {
+        try {
+          if (fileExtension === ".pdf") {
+            text = await extractTextPdf(pathFile);
+          } else {
+            text = await extractTextDocx(pathFile);
+          }
+          content.push(text);
+        } catch (_error) {
+          throw new Error("Error al extraer el texto del archivo");
+        }
+      }
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        res.status(200).json(content);
+        deleteFolder("./src/Uploads", id);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  } catch (error) {
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export { sendMessageText, extractContentText };

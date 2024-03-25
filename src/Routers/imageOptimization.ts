@@ -1,27 +1,27 @@
 import { Router } from "express";
 import fs from "fs";
 import multer from "multer";
-import { getDocxById, sendMessage } from "../Controllers/ControllerDocx";
+import { imageOptimization, sendMessageSaveImg } from "../Controllers/ControllerimageOptimization";
 
 const storage = multer.diskStorage({
-  destination: function (req, _file, cb) {
+  destination: function (req, _file, cd) {
     const { id } = req.params;
-
-    const dir: string = `./src/Uploads/${id}`;
+    const dir = `./src/Uploads/${id}`;
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
-    cb(null, dir);
+    cd(null, dir);
   },
   filename: function (_req, file, cb) {
-    const newFileName: string = `${file.originalname}`;
+    const newFileName = `${file.originalname}`;
     cb(null, newFileName);
   },
 });
 
 const upload = multer({ storage: storage });
 const router = Router();
-router.post("/uploadImg/:id", upload.array("images"), sendMessage);
-router.get("/:id", getDocxById);
+
+router.post("/uploadsImages/:id", upload.array("images"),sendMessageSaveImg);
+router.get("/:id",imageOptimization);
 
 export default router;
